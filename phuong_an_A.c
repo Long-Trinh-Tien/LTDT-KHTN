@@ -90,11 +90,21 @@ void convert_list_to_matrix(int adj[][NUM_OF_ROOMS], int adj_list[][MAX_VERTICES
 
     // Chuyển đổi danh sách kề thành ma trận kề
     for (int i = 0; i < node; i++) {
-        for (int j = 0; adj_list[i][j] != 0; j++) {
-            int vertex = adj_list[i][j];
-            adj[i][vertex - 1]++; // Tăng số lần kết nối
-            if(adj_list[i][j+1] < 0){
-                break;
+        if( i == 0){
+            for (int j = 0; adj_list[node - 1][j] != 0; j++) {
+                int vertex = adj_list[node -1][j];
+                adj[i][vertex - 1]++; // Tăng số lần kết nối
+                if(adj_list[node -1][j+1] < 0){
+                    break;
+                }
+            }
+        } else {
+            for (int j = 0; adj_list[i-1][j] != 0; j++) {
+                int vertex = adj_list[i-1][j];
+                adj[i][vertex - 1]++; // Tăng số lần kết nối
+                if(adj_list[i-1][j+1] < 0){
+                    break;
+                }
             }
         }
     }
@@ -115,7 +125,9 @@ void read_graph_from_file(const char *filename, int *n, int adj_list[MAX_VERTICE
         fscanf(file, "%d", &m); // Đọc số lượng đỉnh kề
         
         for (int j = 0; j < m; j++) {
-            fscanf(file, "%d", &adj_list[i][j]); // Đọc các đỉnh kề
+           int temp;
+            fscanf(file, "%d", &temp); // Đọc số vào tạm
+            adj_list[i][j] = temp + 1; // Cộng 1 vào số và gán vào đỉnh kề
         }
         adj_list[i][m] = -1; // Đánh dấu kết thúc danh sách kề bằng -1
     }

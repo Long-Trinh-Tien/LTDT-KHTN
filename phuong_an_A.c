@@ -80,7 +80,13 @@ void traverse_rooms(int adj_list[][NUM_OF_ROOMS]) {
     }
 }
 
-void convert_list_to_matrix(int adj[][NUM_OF_ROOMS], int adj_list[][MAX_VERTICES], int node) {
+//node is sum of nodes. For example, if there are A, B, C, D nodes, then node = 4
+//start node is count from 0, with above example, start_node = 3 which is D
+void convert_list_to_matrix(int adj[][NUM_OF_ROOMS], int adj_list[][MAX_VERTICES], int node, int start_node) {
+    if (start_node >= node || start_node < 0) {
+        //woah, we cannot convert if start node is greater than node
+        return;
+    }
     // Khởi tạo ma trận kề với 0
     for (int i = 0; i < node; i++) {
         for (int j = 0; j < node; j++) {
@@ -88,24 +94,31 @@ void convert_list_to_matrix(int adj[][NUM_OF_ROOMS], int adj_list[][MAX_VERTICES
         }
     }
 
+    // start with start node in adj[0], i==0
+    for (int j = 0; adj_list[start_node][j] != 0; j++) {
+        int vertex = adj_list[start_node][j];
+        adj[0][vertex - 1]++; // Tăng số lần kết nối
+        if(adj_list[start_node][j+1] < 0){
+            break;
+        }
+    }
+
     // Chuyển đổi danh sách kề thành ma trận kề
+    int index = 1; //index for adj[][] 
     for (int i = 0; i < node; i++) {
-        if( i == 0){
-            for (int j = 0; adj_list[node - 1][j] != 0; j++) {
-                int vertex = adj_list[node -1][j];
-                adj[i][vertex - 1]++; // Tăng số lần kết nối
-                if(adj_list[node -1][j+1] < 0){
-                    break;
-                }
-            }
+        //start at i == 1 
+        if( i == start_node ){
+            //skip start node
+            continue;
         } else {
-            for (int j = 0; adj_list[i-1][j] != 0; j++) {
-                int vertex = adj_list[i-1][j];
-                adj[i][vertex - 1]++; // Tăng số lần kết nối
-                if(adj_list[i-1][j+1] < 0){
+            for (int j = 0; adj_list[i][j] != 0; j++) {
+                int vertex = adj_list[i][j];
+                adj[index][vertex - 1]++; // Tăng số lần kết nối
+                if(adj_list[i][j+1] < 0){
                     break;
                 }
             }
+            index++;
         }
     }
 }
@@ -143,6 +156,7 @@ void read_graph_from_file(const char *filename, int *n, int adj_list[MAX_VERTICE
 }
 
 int main() {
+    int start_node = 3; // D has index 3
     int node; // Số lượng đỉnh
     int adj_list[MAX_VERTICES][MAX_VERTICES]; // Danh sách kề
     int adj_matrix[NUM_OF_ROOMS][NUM_OF_ROOMS]; // Ma trận kề
@@ -153,7 +167,7 @@ int main() {
     //     {1, 1, 2, 4},    // Đỉnh 3 kết nối với 1 (2 lần), 2, 4
     //     {1, 1, 2, 3}     // Đỉnh 4 kết nối với 1, 2, 3
     // };
-    convert_list_to_matrix(adj_matrix, adj_list, node);
+    convert_list_to_matrix(adj_matrix, adj_list, node, start_node);
     // int adj_matrix[NUM_OF_ROOMS][NUM_OF_ROOMS] = {
     // //  {D, A, B, C}
     //     {0, 1, 2, 2},  // D kết nối với A, B 2 lần, C 2 lần
